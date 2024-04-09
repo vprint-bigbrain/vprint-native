@@ -8,6 +8,9 @@
     "slug": "clerkApp",
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "ios": {
+      "bundleIdentifier": "com.anonymous.clerkApp"
+    }
   }
 }
