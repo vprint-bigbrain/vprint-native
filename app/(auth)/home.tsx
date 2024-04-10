@@ -1,16 +1,17 @@
-import React, { useEffect, useState } from "react";
-import { View, StyleSheet, Pressable } from "react-native";
+import React, { useEffect, useState, useRef } from "react";
+import { View, StyleSheet, Pressable, ScrollView } from "react-native";
 import { useUser } from "@clerk/clerk-expo";
 import { Card, Text } from "react-native-paper";
 import { useRouter } from "expo-router";
 import { Chip } from "react-native-paper";
-
 import { supabase } from "../utils/supabase";
 
 const Home = () => {
   const { user } = useUser();
   const router = useRouter();
   const [shopData, setShopData] = useState([]);
+  const scrollViewRef = useRef(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchShopData = async () => {
@@ -19,9 +20,11 @@ const Home = () => {
           .from("shopDetails")
           .select("*")
           .in("name", ["msp1", "msp2", "msp3"]);
+
         if (error) {
           throw error;
         }
+
         setShopData(data);
       } catch (error) {
         console.error("Error fetching shop data:", error.message);
@@ -35,8 +38,36 @@ const Home = () => {
     router.push(`/shops/${shopName}`);
   };
 
+  const handleScroll = async (event) => {
+    const scrollY = event.nativeEvent.contentOffset.y;
+    if (scrollY <= 0 && !isLoading) {
+      setIsLoading(true);
+      try {
+        const { data, error } = await supabase
+          .from("shopDetails")
+          .select("*")
+          .in("name", ["msp1", "msp2", "msp3"]);
+
+        if (error) {
+          throw error;
+        }
+
+        setShopData(data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error("Error fetching shop data:", error.message);
+        setIsLoading(false);
+      }
+    }
+  };
+
   return (
-    <View style={styles.container}>
+    <ScrollView
+      ref={scrollViewRef}
+      onScroll={handleScroll}
+      scrollEventThrottle={200}
+      contentContainerStyle={styles.container}
+    >
       <Text style={styles.welcomeText}>Welcome {user.fullName} 👋</Text>
       <View style={styles.cardContainer}>
         {shopData
@@ -79,7 +110,7 @@ const Home = () => {
             </Pressable>
           ))}
       </View>
-    </View>
+    </ScrollView>
   );
 };
 

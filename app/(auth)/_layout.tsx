@@ -40,6 +40,19 @@ const TabsPage = () => {
         }}
         redirect={!isSignedIn}
       />
+
+      <Tabs.Screen
+        name="orders"
+        options={{
+          headerTitle: "Orders",
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="cube-outline" size={size} color={color} />
+          ),
+          tabBarLabel: "Orders",
+        }}
+        redirect={!isSignedIn}
+      />
+
       <Tabs.Screen
         name="profile"
         options={{
@@ -53,6 +66,7 @@ const TabsPage = () => {
         }}
         redirect={!isSignedIn}
       />
+
       <Tabs.Screen
         name="shops/msp1"
         options={{
